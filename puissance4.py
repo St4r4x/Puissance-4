@@ -1,9 +1,9 @@
 import numpy as np
 
 """
-This code implements a simple tic-tac-toe game.
+This code implements a simple power 4 game.
 
-The game is played on a 3x3 grid. Players take turns placing their marks (X or O) on the grid. The first player to get three of their marks in a row, column, or diagonal wins the game.
+The game is played on a 7x6 grid. Players take turns placing their marks (X or O) on the grid. The first player to get four of their marks in a row, column, or diagonal wins the game.
 
 The code uses the following functions:
 
@@ -113,4 +113,99 @@ def play():
 
         # tour de l'IA
         i = get_move_ai(M)
-        lignes_jouables = cases_jou
+        lignes_jouables = cases_jouables(M)
+        M[lignes_jouables[i]-1][i] = 'O'
+        print(np.array(M))
+        if game_over(M):
+            print("L'IA a gagné")
+            break
+        if draw(M):
+            print("Match nul")
+            break
+
+
+def get_move_ai(M):
+    """
+    Gets the next move for the AI.
+
+    Args:
+        M: The game board.
+
+    Returns:
+        The index of the next move for the AI.
+    """
+
+    best_score = float("-inf")
+    best_move = 0
+    lignes_jouables = cases_jouables(M)
+    for i in range(0, len(M[0])):
+
+        if lignes_jouables[i] != 0:
+
+            M[lignes_jouables[i]-1][i] = 'O'
+            score = minimax(M, False, 4)
+            M[lignes_jouables[i]-1][i] = '-'
+        else:
+            continue
+        if score > best_score:
+            best_score = score
+            best_move = i
+    return best_move
+
+
+def minimax(n, maximizingPlayer, depth):
+    """
+    Performs a minimax search to find the best move for the AI.
+
+    Args:
+        n: The game board.
+        maximizingPlayer: Whether the current player is maximizing or minimizing.
+        depth: The current depth of the search tree.
+
+    Returns:
+        The score of the best move for the current player.
+    """
+
+    if game_over(n) == True:
+        if maximizingPlayer:
+            return -1
+        else:
+            return 1
+    if draw(n) == True:
+        return 0
+
+    if depth == 0:
+        return 0
+
+    if maximizingPlayer:
+        best_score = float("-inf")
+        lignes_jouables = cases_jouables(n)
+        for i in range(0, len(n[0])):
+
+            if lignes_jouables[i] != 0:
+                n[lignes_jouables[i]-1][i] = 'O'
+                score = minimax(n, False, depth-1)
+                n[lignes_jouables[i]-1][i] = '-'
+            else:
+                continue
+            if score > best_score:
+                best_score = score
+        return best_score
+    else:
+        best_score = float("inf")
+        lignes_jouables = cases_jouables(n)
+        for i in range(0, len(n[0])):
+
+            if lignes_jouables[i] != 0:
+                n[lignes_jouables[i]-1][i] = 'X'
+                score = minimax(n, True, depth-1)
+                n[lignes_jouables[i]-1][i] = '-'
+            else:
+                continue
+            if score < best_score:
+                best_score = score
+        return best_score
+
+
+if __name__ == "__main__":
+    play()
